@@ -1,7 +1,7 @@
 module LiquidInheritance
 
   class Extends < ::Liquid::Block
-    Syntax = /(#{Liquid::QuotedFragment})/
+    Syntax = /(#{Liquid::QuotedFragment}+)/
 
     def initialize(tag_name, markup, tokens)
       if markup =~ Syntax
@@ -72,7 +72,7 @@ module LiquidInheritance
     end
 
     def load_template(context)
-      source = Liquid::Template.file_system.read_template_file(@template_name, context)
+      source = Liquid::Template.file_system.read_template_file(@template_name[1..-2], context)
       Liquid::Template.parse(source)
     end
 

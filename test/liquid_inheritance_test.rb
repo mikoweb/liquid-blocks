@@ -3,13 +3,12 @@ $:.unshift(File.join(File.dirname(__FILE__), '../lib'))
 require 'rubygems'
 require 'test/unit'
 require 'shoulda'
-require 'redgreen' rescue nil
 
 require 'liquid_inheritance'
 
 class TestFileSystem
   
-  def read_template_file(path)
+  def read_template_file(path, context)
     if path == 'simple'
       'test'
     elsif path == 'complex'
@@ -26,7 +25,7 @@ class TestFileSystem
         
       end
       }
-    elsif 'nested'
+    elsif path == 'nested'
       %{
         {% extends 'complex' %}
         
