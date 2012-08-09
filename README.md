@@ -3,6 +3,16 @@
 This gem adds Django-like `block` and `extends` tags to the
 [Liquid](http://www.liquidmarkup.org/) templating language.
 
+## Usage
+
+Add the following to your `Gemfile`:
+
+    gem 'liquid-blocks'
+
+And the following to your code:
+
+    require 'liquid_blocks'
+
 ## License
 
 This work is licensed under the MIT License (see the LICENSE file).
