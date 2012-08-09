@@ -13,13 +13,13 @@ And the following to your code
 
     require 'liquid_blocks'
 
-This allows you to have template `hello.liquid`
+This allows you to have `hello.liquid`
 
     {% extends 'layout' %}
 
     {% block middle %}hello{% endblock %}
 
-Which extends template `_layout.liquid`
+Which extends `_layout.liquid`
 
     top
 
