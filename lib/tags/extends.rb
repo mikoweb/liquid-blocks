@@ -72,7 +72,7 @@ module LiquidInheritance
     end
     
     def load_template(context)
-      source = Liquid::Template.file_system.read_template_file(context[@template_name])      
+      source = Liquid::Template.file_system.read_template_file(@template_name, context)
       Liquid::Template.parse(source)
     end
     
