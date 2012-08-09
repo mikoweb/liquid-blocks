@@ -55,7 +55,7 @@ class LiquidBlocksTest < Test::Unit::TestCase
       {% endblock %}
     }
 
-    assert_includes template.render, 'test'
+    assert_match /test/, template.render
   end
 
   def test_render_original_content_of_block_if_no_child_block_given
@@ -63,8 +63,8 @@ class LiquidBlocksTest < Test::Unit::TestCase
       {% extends 'complex' %}
     }
 
-    assert_includes template.render, 'rarrgh'
-    assert_includes template.render, 'bum'
+    assert_match /rarrgh/, template.render
+    assert_match /bum/, template.render
   end
 
   def test_render_child_content_of_block_if_child_block_given
@@ -76,8 +76,8 @@ class LiquidBlocksTest < Test::Unit::TestCase
       {% endblock %}
     }
 
-    assert_includes template.render, 'booyeah'
-    assert_includes template.render, 'bum'
+    assert_match /booyeah/, template.render
+    assert_match /bum/, template.render
   end
 
   def test_render_child_content_of_blocks_if_multiple_child_blocks_given
@@ -93,8 +93,8 @@ class LiquidBlocksTest < Test::Unit::TestCase
       {% endblock %}
     }
 
-    assert_includes template.render, 'booyeah'
-    assert_includes template.render, 'blurb'
+    assert_match /booyeah/, template.render
+    assert_match /blurb/, template.render
   end
 
   def test_remember_context_of_child_template
@@ -112,8 +112,8 @@ class LiquidBlocksTest < Test::Unit::TestCase
 
     res = template.render 'a' => 1234
 
-    assert_includes res, 'booyeah'
-    assert_includes res, '1234'
+    assert_match /booyeah/, res
+    assert_match /1234/, res
   end
 
   def test_work_with_nested_templates
@@ -127,8 +127,8 @@ class LiquidBlocksTest < Test::Unit::TestCase
 
     res = template.render 'a' => 1234
 
-    assert_includes res, 'booyeah'
-    assert_includes res, 'from nested'
+    assert_match /booyeah/, res
+    assert_match /from nested/, res
   end
 
   def test_work_with_nested_templates_if_middle_template_skips_a_block
@@ -142,7 +142,7 @@ class LiquidBlocksTest < Test::Unit::TestCase
 
     res = template.render
 
-    assert_includes res, 'win'
+    assert_match /win/, res
   end
 
   def test_render_parent_for_block_super
@@ -156,6 +156,6 @@ class LiquidBlocksTest < Test::Unit::TestCase
 
     res = template.render 'a' => 1234
 
-    assert_includes res, 'rarrgh'
+    assert_match /rarrgh/, res
   end
 end
