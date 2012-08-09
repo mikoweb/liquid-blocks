@@ -13,6 +13,28 @@ And the following to your code
 
     require 'liquid_blocks'
 
+This allows you to have template `hello.liquid`
+
+    {% extends 'layout' %}
+
+    {% block middle %}hello{% endblock %}
+
+Which extends template `_layout.liquid`
+
+    top
+
+    {% block middle %}middle{% endblock %}
+
+    bottom
+
+Which renders into
+
+    top
+
+    hello
+
+    bottom
+
 ## License
 
 This work is licensed under the MIT License (see the LICENSE file).
