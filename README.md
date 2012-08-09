@@ -5,11 +5,11 @@ This gem adds Django-like `block` and `extends` tags to the
 
 ## Usage
 
-Add the following to your `Gemfile`:
+Add the following to your `Gemfile`
 
     gem 'liquid-blocks'
 
-And the following to your code:
+And the following to your code
 
     require 'liquid_blocks'
 
