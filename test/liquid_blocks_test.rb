@@ -4,7 +4,7 @@ require 'rubygems'
 require 'test/unit'
 require 'shoulda'
 
-require 'liquid_inheritance'
+require 'liquid_blocks'
 
 class TestFileSystem
   
@@ -50,7 +50,7 @@ class TestFileSystem
   
 end
 
-class LiquidInheritanceTest < Test::Unit::TestCase
+class LiquidBlocksTest < Test::Unit::TestCase
   context 'given a template with an extends tag' do
     setup do
       Liquid::Template.file_system = TestFileSystem.new

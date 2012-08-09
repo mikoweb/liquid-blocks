@@ -1,4 +1,4 @@
-module LiquidInheritance
+module LiquidBlocks
 
   class BlockDrop < ::Liquid::Drop
     def initialize(block)

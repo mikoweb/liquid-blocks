@@ -1,4 +1,4 @@
-module LiquidInheritance
+module LiquidBlocks
 
   class Extends < ::Liquid::Block
     Syntax = /(#{Liquid::QuotedFragment}+)/
@@ -13,7 +13,7 @@ module LiquidInheritance
       super
 
       @blocks = @nodelist.inject({}) do |m, node|
-        m[node.name] = node if node.is_a?(::LiquidInheritance::Block); m
+        m[node.name] = node if node.is_a?(::LiquidBlocks::Block); m
       end
     end
 
@@ -79,7 +79,7 @@ module LiquidInheritance
     def find_blocks(node, blocks={})
       if node.respond_to?(:nodelist) && !node.nodelist.nil?
         node.nodelist.inject(blocks) do |b, node|
-          if node.is_a?(LiquidInheritance::Block)
+          if node.is_a?(LiquidBlocks::Block)
             b[node.name] = node
           else
             find_blocks(node, b)

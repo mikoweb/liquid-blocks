@@ -1,1 +1,6 @@
+*swp
+.bundle
+.rock.yml
+Gemfile.lock
 pkg
+vendor
