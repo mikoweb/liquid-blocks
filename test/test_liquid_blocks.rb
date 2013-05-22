@@ -31,6 +31,16 @@ class TestFileSystem
         from nested (another)
         {% endblock %}
       }
+    elsif path == 'similar'
+      %{
+        {% block aralia %}
+        aralia
+        {% endblock %}
+
+        {% block azalea %}
+        azalea
+        {% endblock %}
+      }
     else
       %{
         {% extends 'complex' %}
@@ -157,5 +167,24 @@ class LiquidBlocksTest < Test::Unit::TestCase
     res = template.render 'a' => 1234
 
     assert_match /rarrgh/, res
+  end
+
+  def test_render_separate_block_content_for_blocks_with_identical_first_or_last_letters
+    template = Liquid::Template.parse %{
+      {% extends 'similar' %}
+
+      {% block aralia %}
+      spikenard
+      {% endblock %}
+
+      {% block azalea %}
+      tsutsuji
+      {% endblock %}
+    }
+
+    res = template.render
+
+    assert_match /spikenard/, res
+    assert_match /tsutsuji/, res
   end
 end
