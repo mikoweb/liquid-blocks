@@ -41,6 +41,17 @@ class TestFileSystem
         azalea
         {% endblock %}
       }
+    elsif path == 'deep'
+      %{
+        {% block one %}
+          one
+          {% block two %}
+            two
+            {% block three %}three{% endblock %}
+            {% block four %}four{% endblock %}
+          {% endblock %}
+        {% endblock %}
+      }
     else
       %{
         {% extends 'complex' %}
@@ -186,5 +197,32 @@ class LiquidBlocksTest < Test::Unit::TestCase
 
     assert_match /spikenard/, res
     assert_match /tsutsuji/, res
+  end
+
+  def test_render_deep_blocks
+    template = Liquid::Template.parse %{
+      {% extends 'deep' %}
+    }
+
+    res = template.render
+
+    assert_match /three/, res
+  end
+
+  def test_render_deep_blocks_override_inner_blocks
+    template = Liquid::Template.parse %{
+      {% extends 'deep' %}
+
+      {% block two %}extra {{ block.super }}{% endblock %}
+      {% block three %}override{% endblock %}
+    }
+
+    res = template.render
+
+    assert_match /one/, res
+    assert_match /two/, res
+    assert_match /extra/, res
+    assert_match /override/, res
+    assert_no_match /three/, res
   end
 end

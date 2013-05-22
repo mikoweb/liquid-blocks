@@ -81,9 +81,8 @@ module LiquidBlocks
         node.nodelist.inject(blocks) do |b, node|
           if node.is_a?(LiquidBlocks::Block)
             b[node.name] = node
-          else
-            find_blocks(node, b)
           end
+          find_blocks(node, b)
 
           b
         end
