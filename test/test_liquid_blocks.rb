@@ -52,6 +52,11 @@ class TestFileSystem
           {% endblock %}
         {% endblock %}
       }
+    elsif path == 'ruby'
+      %{
+        {% block test %}{% endblock %}
+        {% block test! %}{% endblock %}
+      }
     else
       %{
         {% extends 'complex' %}
@@ -224,5 +229,19 @@ class LiquidBlocksTest < Test::Unit::TestCase
     assert_match /extra/, res
     assert_match /override/, res
     assert_no_match /three/, res
+  end
+
+  def test_render_blocks_ruby_name
+    template = Liquid::Template.parse %{
+      {% extends 'ruby' %}
+
+      {% block test %}quiet{% endblock %}
+      {% block test! %}loud{% endblock %}
+    }
+
+    res = template.render
+
+    assert_match /quiet/, res
+    assert_match /loud/, res
   end
 end

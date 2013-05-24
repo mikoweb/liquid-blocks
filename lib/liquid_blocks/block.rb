@@ -11,7 +11,7 @@ module LiquidBlocks
   end
 
   class Block < ::Liquid::Block
-    Syntax = /(\w+)/
+    Syntax = /([\w!]+)/
 
     attr_accessor :parent
     attr_reader :name
