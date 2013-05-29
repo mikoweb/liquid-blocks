@@ -5,16 +5,11 @@ module LiquidBlocks
 
     def initialize(tag_name, markup, tokens)
       if markup =~ Syntax
-        @template_name = $1
+        @template_name = $1[1..-2]
       else
         raise Liquid::SyntaxError.new("Syntax Error in 'extends' - Valid syntax: extends [template]")
       end
-
       super
-
-      @blocks = @nodelist.inject({}) do |m, node|
-        m[node.name] = node if node.is_a?(::LiquidBlocks::Block); m
-      end
     end
 
     def parse(tokens)
@@ -22,22 +17,17 @@ module LiquidBlocks
     end
 
     def render(context)
-      template = load_template(context)
-      parent_blocks = find_blocks(template.root)
+      origin = populate_nodelist(self, context)
+      origin.render(context)
+    end
 
-      @blocks.each do |name, block|
-        if pb = parent_blocks[name]
-          pb.parent = block.parent
-          pb.add_parent(pb.nodelist)
-          pb.nodelist = block.nodelist
-        else
-          if is_extending?(template)
-            template.root.nodelist << block
-          end
-        end
-      end
-
-      template.render(context)
+    # Load the template that is being extended by the current tag.
+    #
+    # @param context [Liquid::Context] the context to use when loading the template
+    # @return [Liquid::Document] the parsed template
+    def load_template(context)
+      source = Liquid::Template.file_system.read_template_file(@template_name, context)
+      Liquid::Template.parse(source)
     end
 
     private
@@ -71,11 +61,14 @@ module LiquidBlocks
       end
     end
 
-    def load_template(context)
-      source = Liquid::Template.file_system.read_template_file(@template_name[1..-2], context)
-      Liquid::Template.parse(source)
-    end
-
+    # Find all +block+ tags defined as children of the given node.
+    #
+    # The returned hash will have keys that are the names of the declared
+    # blocks, with values of +LiquidBlocks::Block+ instances.
+    #
+    # @param node [Liquid::Tag] a possible +block+ tag
+    # @param blocks [Hash] a set of existing blocks to build on
+    # @return [Hash] all blocks provided by the given node
     def find_blocks(node, blocks={})
       if node.respond_to?(:nodelist) && !node.nodelist.nil?
         node.nodelist.inject(blocks) do |b, node|
@@ -91,8 +84,50 @@ module LiquidBlocks
       blocks
     end
 
-    def is_extending?(template)
-      template.root.nodelist.any? { |node| node.is_a?(Extends) }
+    # Get the first +extends+ tag in the given template, falling back to
+    # +nil+ if the template does not contain an +extends+ tag.
+    #
+    # @param template [Liquid::Document] a template in which to search for an +extends+ tag
+    # @return [LiquidBlocks::Extends] the first +extends+ tag, or +nil+
+    def get_extends_tag_for_template(template)
+      template.root.nodelist.select { |node| node.is_a?(Extends) }.first
+    end
+
+    # Populate the nodelist for the highest-level template being extended with
+    # the contents of its child +block+ tags.
+    #
+    # @param tag [Liquid::Tag] an instance of an +extends+ tag
+    # @param context [Liquid::Context] the context to use when loading the template
+    # @return [Liquid::Document] the top-level template with a modified nodelist
+    def populate_nodelist(tag, context)
+
+      # Get the template being extended by the tag and get an appropriate root
+      # node for it based on whether or not it extends another template
+      parent = tag.load_template(context)
+      parent_blocks = find_blocks(parent.root)
+      extends = get_extends_tag_for_template(parent)
+      parent_node = extends || parent.root
+
+      # Examine every block in the current tag, replacing a matching block in
+      # its parent or adding it to its parent's nodelist, provided that the
+      # parent is not the top-level template
+      find_blocks(tag).each do |name, block|
+        parent_block = parent_blocks[name]
+        if parent_block
+          parent_block.parent = block.parent
+          parent_block.add_parent(parent_block.nodelist)
+          parent_block.nodelist = block.nodelist
+        elsif extends
+          parent_node.nodelist << block
+        end
+      end
+
+      # If the current template extends another, walk up the inheritance chain
+      if extends
+        populate_nodelist(extends, context)
+      end
+
+      parent
     end
 
   end

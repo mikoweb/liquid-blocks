@@ -31,6 +31,14 @@ class TestFileSystem
         from nested (another)
         {% endblock %}
       }
+    elsif path == 'nested_more'
+      %{
+        {% extends 'complex' %}
+
+        {% block thing %}
+        thing
+        {% endblock %}
+      }
     elsif path == 'similar'
       %{
         {% block aralia %}
@@ -52,18 +60,14 @@ class TestFileSystem
           {% endblock %}
         {% endblock %}
       }
+    elsif path == 'nested_deep'
+      %{
+        {% extends 'deep' %}
+      }
     elsif path == 'ruby'
       %{
         {% block test %}{% endblock %}
         {% block test! %}{% endblock %}
-      }
-    else
-      %{
-        {% extends 'complex' %}
-
-        {% block thing %}
-        from nested
-        {% endblock %}
       }
     end
   end
@@ -159,7 +163,7 @@ class LiquidBlocksTest < Test::Unit::TestCase
 
   def test_work_with_nested_templates_if_middle_template_skips_a_block
     template = Liquid::Template.parse %{
-      {% extends 'nested2' %}
+      {% extends 'nested_more' %}
 
       {% block another %}
       win
@@ -169,6 +173,7 @@ class LiquidBlocksTest < Test::Unit::TestCase
     res = template.render
 
     assert_match /win/, res
+    assert_no_match /bum/, res
   end
 
   def test_render_parent_for_block_super
@@ -229,6 +234,21 @@ class LiquidBlocksTest < Test::Unit::TestCase
     assert_match /extra/, res
     assert_match /override/, res
     assert_no_match /three/, res
+  end
+
+  def test_render_deep_blocks_hide_child_blocks_if_parent_empty
+    template = Liquid::Template.parse %{
+      {% extends 'nested_deep' %}
+
+      {% block two %}{% endblock %}
+      {% block three %}hidden{% endblock %}
+    }
+
+    res = template.render
+
+    assert_no_match /two/, res
+    assert_no_match /hidden/, res
+    assert_no_match /four/, res
   end
 
   def test_render_blocks_ruby_name
