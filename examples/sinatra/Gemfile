@@ -1,5 +1,0 @@
-source :rubygems
-
-gem 'liquid'
-gem 'liquid-blocks'
-gem 'sinatra'
