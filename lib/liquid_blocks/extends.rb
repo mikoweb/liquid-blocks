@@ -3,6 +3,8 @@ module LiquidBlocks
   class Extends < ::Liquid::Block
     Syntax = /(#{Liquid::QuotedFragment}+)/
 
+    attr_reader :template_name
+
     def initialize(tag_name, markup, tokens)
       if markup =~ Syntax
         @template_name = $1[1..-2]
@@ -119,6 +121,14 @@ module LiquidBlocks
           parent_block.nodelist = block.nodelist
         elsif extends
           parent_node.nodelist << block
+        end
+      end
+
+      # Pass likely context variables on to parent templates
+      included_templates = (context.registers[:cached_partials] || {}).keys
+      included_templates.each do |included_template|
+        if context.has_key?(included_template)
+          context[tag.template_name] ||= context[included_template]
         end
       end
 

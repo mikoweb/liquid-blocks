@@ -69,6 +69,18 @@ class TestFileSystem
         {% block test %}{% endblock %}
         {% block test! %}{% endblock %}
       }
+    elsif path == 'context_variable'
+      %{
+        {% block body %}{{ context_variable }}{% endblock %}
+      }
+    elsif path == 'context_variable_extended'
+      %{
+        {% extends 'context_variable' %}
+        {% block body %}
+          1{{ block.super }}
+          2{{ context_variable_extended }}
+        {% endblock %}
+      }
     end
   end
 end
@@ -263,5 +275,41 @@ class LiquidBlocksTest < Test::Unit::TestCase
 
     assert_match /quiet/, res
     assert_match /loud/, res
+  end
+
+  def test_render_context_variable
+    template = Liquid::Template.parse %{
+      {% assign var = "context" %}
+      {% include 'context_variable' with var %}
+    }
+
+    res = template.render
+
+    assert_match /context/, res
+  end
+
+  def test_render_context_variable_extended
+    template = Liquid::Template.parse %{
+      {% assign var = "context" %}
+      {% include 'context_variable_extended' with var %}
+    }
+
+    res = template.render
+
+    assert_match /1context/, res
+    assert_match /2context/, res
+  end
+
+  def test_render_context_variable_extended_preserve_existing
+    template = Liquid::Template.parse %{
+      {% assign context_variable = "preserve" %}
+      {% assign var = "pass" %}
+      {% include 'context_variable_extended' with var %}
+    }
+
+    res = template.render
+
+    assert_match /1preserve/, res
+    assert_match /2pass/, res
   end
 end
