@@ -38,9 +38,22 @@ module LiquidBlocks
       if parent
         parent.add_parent(nodelist)
       else
-        self.parent = Block.new(@tag_name, @name, nil)
-        parent.nodelist = nodelist
+        begin
+          self.parent = Block.parse(@tag_name, @name, nodelist, {})
+        rescue
+        end
+        if parent != nil
+          parent.nodelist = nodelist
+        end
       end
+    end
+
+    def nodelist=(list)
+      @nodelist = list
+    end
+
+    def blank?
+      false
     end
 
     def call_super(context)

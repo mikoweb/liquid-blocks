@@ -44,7 +44,7 @@ module LiquidBlocks
           if token =~ /^#{Liquid::TagStart}\s*(\w+)\s*(.*)?#{Liquid::TagEnd}$/
             # fetch the tag from registered blocks
             if tag = Liquid::Template.tags[$1]
-              @nodelist << tag.new($1, $2, tokens)
+              @nodelist << tag.parse($1, $2, tokens, {})
             else
               # this tag is not registered with the system
               # pass it to the current block for special handling or error reporting
