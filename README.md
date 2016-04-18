@@ -7,7 +7,7 @@ This gem adds Django-like `block` and `extends` tags to the
 
 Add the following to your `Gemfile`
 
-    gem 'liquid-blocks'
+    gem 'liquid4-blocks', '~> 0.7.0'
 
 And the following to your code
 
