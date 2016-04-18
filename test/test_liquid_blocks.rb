@@ -2,7 +2,7 @@ require 'test/unit'
 require 'liquid_blocks'
 
 class TestFileSystem
-  def read_template_file(path, context)
+  def read_template_file(path)
     if path == 'simple'
       'test'
     elsif path == 'complex'

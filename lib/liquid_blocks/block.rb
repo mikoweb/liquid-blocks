@@ -11,13 +11,15 @@ module LiquidBlocks
   end
 
   class Block < ::Liquid::Block
-    Syntax = /([\w!]+)/
+    SYNTAX = /([\w!]+)/
 
     attr_accessor :parent
     attr_reader :name
 
     def initialize(tag_name, markup, tokens)
-      if markup =~ Syntax
+      @parent = nil
+
+      if markup =~ SYNTAX
         @name = $1
       else
         raise Liquid::SyntaxError.new("Syntax Error in 'block' - Valid syntax: block [name]")
@@ -30,26 +32,18 @@ module LiquidBlocks
       context.stack do
         context['block'] = BlockDrop.new(self)
 
-        render_all(@nodelist, context)
+        super
       end
     end
 
     def add_parent(nodelist)
-      if parent
-        parent.add_parent(nodelist)
+      if @parent != nil
+        @parent.add_parent(nodelist)
       else
-        begin
-          self.parent = Block.parse(@tag_name, @name, nodelist, {})
-        rescue
-        end
-        if parent != nil
-          parent.nodelist = nodelist
-        end
+        @parent = Block.parse(@tag_name, @name, Liquid::Tokenizer.new(@name + '{% end' + @tag_name + '%}'), @parse_context)
+        @parent.nodelist.clear
+        nodelist.each {|item| @parent.nodelist << item}
       end
-    end
-
-    def nodelist=(list)
-      @nodelist = list
     end
 
     def blank?
@@ -57,8 +51,8 @@ module LiquidBlocks
     end
 
     def call_super(context)
-      if parent
-        parent.render(context)
+      if @parent
+        @parent.render(context)
       else
         ''
       end
